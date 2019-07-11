@@ -4,6 +4,7 @@ import collections
 import itertools as it
 import operator
 import warnings
+import six
 
 import numpy as np
 import pandas as pd
@@ -135,6 +136,11 @@ def _groupby_raise_unaligned(df, **kwargs):
 
     For more information see pandas GH issue #15244 and Dask GH issue #1876."""
     by = kwargs.get("by", None)
+    # https://github.com/dask/dask/issues/5080
+    # deal with situation where by is column name for one column    
+    if isinstance(by, six.string_types):
+        by = [by]
+
     if by is not None and not _is_aligned(df, by):
         msg = (
             "Grouping by an unaligned index is unsafe and unsupported.\n"
